@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0C2426">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi plan">
+<title>Mi plan</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%230C2426'/%3E%3Crect x='30' y='78' width='120' height='24' rx='4' fill='%23F2B33D'/%3E%3Crect x='18' y='62' width='22' height='56' rx='5' fill='%23F2B33D'/%3E%3Crect x='140' y='62' width='22' height='56' rx='5' fill='%23F2B33D'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0C2426;--ink2:#123033;--surface:#16393C;--line:#22514F;
+  --amber:#F2B33D;--amber-dim:#8a6a2a;--paper:#EDF2F0;--muted:#8FAFAD;
+  --disp:'Oswald',"Arial Narrow",sans-serif;
+  --body:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;overscroll-behavior-y:none}
+body{background:var(--ink);color:var(--paper);font-family:var(--body);font-size:16px;line-height:1.45;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+h1{font-family:var(--disp);font-weight:700;font-size:clamp(30px,9vw,42px);line-height:.95;
+  text-transform:uppercase;margin:0}
+h1 span{display:block;color:var(--muted);font-size:.42em;letter-spacing:.06em;margin-top:8px}
+.eyebrow{font-family:var(--disp);font-weight:500;font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--amber);margin:0 0 6px}
+header{padding:26px 0 16px}
+.hidden{display:none}
+
+/* --- navegación inferior --- */
+nav{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--ink2);
+  border-top:1.5px solid var(--line);display:flex;
+  padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:none;color:var(--muted);padding:12px 4px 12px;
+  font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+nav button i{display:block;font-style:normal;font-size:20px;margin-bottom:3px;opacity:.75}
+nav button.on{color:var(--amber)}
+nav button.on i{opacity:1}
+nav button:focus-visible{outline:2px solid var(--paper);outline-offset:-3px}
+
+/* --- pestañas internas --- */
+.tabs{position:sticky;top:0;z-index:20;background:var(--ink);display:flex;gap:8px;padding:10px 0}
+.tab{flex:1;background:none;border:1.5px solid var(--line);color:var(--muted);border-radius:2px;
+  padding:10px 4px 8px;font-family:var(--disp);font-weight:500;font-size:12px;letter-spacing:.12em;
+  text-transform:uppercase;cursor:pointer}
+.tab b{display:block;font-size:19px;font-weight:700;letter-spacing:0;line-height:1}
+.tab.on{background:var(--amber);border-color:var(--amber);color:var(--ink)}
+.tab:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.sub{font-family:var(--disp);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin:2px 0 14px}
+
+/* --- ejercicio --- */
+.ej{background:var(--surface);border-radius:3px;padding:14px 14px 12px;margin-bottom:10px;
+  border-left:3px solid var(--line)}
+.ej.done{border-left-color:var(--amber)}
+.ej-top{display:flex;align-items:baseline;gap:10px}
+.num{font-family:var(--disp);font-weight:700;font-size:13px;color:var(--amber-dim);min-width:18px;
+  font-variant-numeric:tabular-nums}
+.ej.done .num{color:var(--amber)}
+.nombre{font-family:var(--disp);font-weight:500;font-size:19px;text-transform:uppercase;
+  line-height:1.1;flex:1}
+.pauta{font-family:var(--disp);font-size:15px;color:var(--amber);white-space:nowrap;
+  font-variant-numeric:tabular-nums}
+.tip{font-size:13px;color:var(--muted);margin:6px 0 0 28px;line-height:1.35}
+.prev{font-family:var(--disp);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--amber-dim);margin:8px 0 0 28px}
+.fila{display:flex;align-items:center;gap:12px;margin:10px 0 0 28px;flex-wrap:wrap}
+.dots{display:flex;gap:8px}
+.dot{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:none;
+  color:var(--muted);font-family:var(--disp);font-size:13px;cursor:pointer;padding:0;
+  display:grid;place-items:center;transition:background .15s,color .15s,transform .1s}
+.dot:active{transform:scale(.92)}
+.dot.on{background:var(--amber);border-color:var(--amber);color:var(--ink);font-weight:700}
+.dot:focus-visible{outline:2px solid var(--paper);outline-offset:2px}
+.peso{display:flex;align-items:center;gap:6px;margin-left:auto}
+.peso input{width:64px;background:var(--ink2);border:1.5px solid var(--line);border-radius:2px;
+  color:var(--paper);padding:8px 6px;font-family:var(--disp);font-size:17px;text-align:center;
+  font-variant-numeric:tabular-nums}
+.peso input:focus{outline:none;border-color:var(--amber)}
+.peso label{font-family:var(--disp);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted)}
+
+/* --- comida --- */
+.meal{background:var(--surface);border-radius:3px;margin-bottom:10px;overflow:hidden}
+.meal-h{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
+.hora{font-family:var(--disp);font-weight:700;font-size:22px;color:var(--amber);
+  font-variant-numeric:tabular-nums;min-width:62px}
+.meal-t{flex:1}
+.meal-t b{font-family:var(--disp);font-weight:500;font-size:17px;text-transform:uppercase;
+  display:block;line-height:1.15}
+.meal-t small{color:var(--muted);font-size:12.5px}
+.check{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);background:none;
+  color:var(--muted);display:grid;place-items:center;cursor:pointer;font-size:15px;flex-shrink:0}
+.check.on{background:var(--amber);border-color:var(--amber);color:var(--ink)}
+.opts{border-top:1px solid var(--line);padding:4px 14px 12px}
+.opt{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(34,81,79,.5);
+  font-size:14px;cursor:pointer;align-items:flex-start}
+.opt:last-child{border-bottom:none}
+.opt em{font-style:normal;color:var(--amber-dim);font-family:var(--disp);font-size:13px;
+  min-width:16px;padding-top:1px}
+.opt.sel em{color:var(--amber)}
+.opt.sel span{color:var(--paper)}
+.opt span{color:var(--muted);line-height:1.35}
+.macros{display:flex;gap:8px;margin:0 0 14px}
+.macro{flex:1;background:var(--ink2);border-radius:3px;padding:10px 6px;text-align:center}
+.macro b{display:block;font-family:var(--disp);font-size:22px;color:var(--amber);
+  font-variant-numeric:tabular-nums;line-height:1}
+.macro small{font-family:var(--disp);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted)}
+
+/* --- progreso --- */
+.bw-in{display:flex;gap:8px;margin-bottom:16px}
+.bw-in input{flex:1;background:var(--ink2);border:1.5px solid var(--line);border-radius:2px;
+  color:var(--paper);padding:13px;font-family:var(--disp);font-size:20px;text-align:center;
+  font-variant-numeric:tabular-nums}
+.bw-in input:focus{outline:none;border-color:var(--amber)}
+.bw-in button{background:var(--amber);border:none;color:var(--ink);border-radius:2px;padding:0 20px;
+  font-family:var(--disp);font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;cursor:pointer}
+.graf{background:var(--surface);border-radius:3px;padding:16px 12px 10px;margin-bottom:14px}
+.graf svg{width:100%;height:150px;display:block}
+.reg{display:flex;justify-content:space-between;padding:11px 4px;border-bottom:1px solid var(--line);
+  font-size:14px}
+.reg b{font-family:var(--disp);font-size:17px;font-variant-numeric:tabular-nums}
+.reg span{color:var(--muted)}
+.reg .del{color:var(--amber-dim);cursor:pointer;padding:0 6px;background:none;border:none;font-size:16px}
+
+.notas{border:1px dashed var(--line);border-radius:3px;padding:14px 16px;margin:20px 0}
+.notas h2{font-family:var(--disp);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--amber);margin:0 0 10px;font-weight:500}
+.notas ul{margin:0;padding-left:18px}
+.notas li{font-size:14px;color:var(--muted);margin-bottom:7px;line-height:1.4}
+.notas li b{color:var(--paper);font-weight:600}
+.reset{background:none;border:none;color:var(--muted);font-family:var(--disp);font-size:11px;
+  letter-spacing:.15em;text-transform:uppercase;padding:12px 0 20px;cursor:pointer;display:block;
+  margin:0 auto}
+
+/* --- descanso --- */
+.timer{position:fixed;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom));z-index:40;
+  background:var(--ink2);border-top:1.5px solid var(--line);padding:12px 16px;
+  transform:translateY(150%);transition:transform .25s ease}
+.timer.show{transform:translateY(0)}
+.timer-in{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.cuenta{font-family:var(--disp);font-weight:700;font-size:32px;color:var(--amber);
+  font-variant-numeric:tabular-nums;line-height:1;min-width:86px}
+.timer-txt{font-family:var(--disp);font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);flex:1}
+.timer button{background:none;border:1.5px solid var(--line);color:var(--paper);font-family:var(--disp);
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:10px 14px;border-radius:2px;
+  cursor:pointer}
+.barra{height:2px;background:var(--line);margin-top:9px;border-radius:2px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--amber);width:100%}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- ============ GIMNASIO ============ -->
+<section id="p-gym">
+  <header>
+    <p class="eyebrow">3 días · solo máquinas</p>
+    <h1>Gimnasio<span>Fase 1 · 8 semanas</span></h1>
+  </header>
+  <div class="tabs">
+    <button class="tab on" data-s="A"><b>A</b>Lunes</button>
+    <button class="tab" data-s="B"><b>B</b>Miércoles</button>
+    <button class="tab" data-s="C"><b>C</b>Viernes</button>
+  </div>
+  <p class="sub" id="gym-sub"></p>
+  <div id="gym-lista"></div>
+  <div class="notas">
+    <h2>Recordatorio</h2>
+    <ul>
+      <li><b>Calentar 8 min</b> en bici o elíptica. Primera serie de cada máquina, con poco peso.</li>
+      <li><b>Deja 2-3 repeticiones sin hacer</b> en cada serie. Nada de fallo.</li>
+      <li><b>Sube peso</b> cuando completes las 3 series en el número alto de repeticiones.</li>
+      <li><b>Al terminar:</b> 15 min de bici o cinta en pendiente andando. Sin correr.</li>
+      <li><b>Cada día:</b> 8.000-10.000 pasos.</li>
+    </ul>
+  </div>
+  <button class="reset" id="gym-reset">Borrar marcas de esta sesión</button>
+</section>
+
+<!-- ============ COMIDA ============ -->
+<section id="p-food" class="hidden">
+  <header>
+    <p class="eyebrow">2.000 kcal · 170 g proteína</p>
+    <h1>Comida<span>Ventana 14:00 – 22:00</span></h1>
+  </header>
+  <div class="macros">
+    <div class="macro"><b>2000</b><small>kcal</small></div>
+    <div class="macro"><b>170</b><small>Proteína</small></div>
+    <div class="macro"><b>180</b><small>Carbo</small></div>
+    <div class="macro"><b>65</b><small>Grasa</small></div>
+  </div>
+  <p class="sub">Toca una comida para elegir opción</p>
+  <div id="food-lista"></div>
+  <div class="notas">
+    <h2>Lista de la compra · semana</h2>
+    <ul>
+      <li><b>Carne:</b> 2 kg pechuga de pollo, 1 kg lomo de cerdo, 1 kg ternera magra o picada 90%</li>
+      <li><b>Huevos:</b> 2 docenas</li>
+      <li><b>Lácteos:</b> 7 skyr o queso batido 0%, 1 l leche semi, 1 kg yogur griego 0%</li>
+      <li><b>Hidratos:</b> 3 kg patata, 1 kg arroz, 500 g pasta, avena, pan integral</li>
+      <li><b>Fruta:</b> 21 piezas (plátano, manzana, naranja)</li>
+      <li><b>Despensa:</b> tomate triturado, cebolla, pimiento, zanahoria, aceite de oliva, especias</li>
+      <li><b>Suplemento:</b> omega-3 en cápsulas</li>
+    </ul>
+  </div>
+  <div class="notas">
+    <h2>Domingo · 40 minutos</h2>
+    <ul>
+      <li>Horno a 200°: bandeja de pollo y otra de patatas, 35 min.</li>
+      <li>Olla grande de arroz y 12 huevos cocidos.</li>
+      <li>Sofrito de cebolla, pimiento y zanahoria triturado con tomate: congela en raciones.</li>
+      <li>Tápers montados en 5 minutos cada noche.</li>
+    </ul>
+  </div>
+  <button class="reset" id="food-reset">Reiniciar comidas del día</button>
+</section>
+
+<!-- ============ PROGRESO ============ -->
+<section id="p-prog" class="hidden">
+  <header>
+    <p class="eyebrow">4 pesadas por semana</p>
+    <h1>Progreso<span>En ayunas, al levantarte</span></h1>
+  </header>
+  <div class="bw-in">
+    <input type="text" inputmode="decimal" id="bw-val" placeholder="112.0" aria-label="Peso corporal en kg">
+    <button id="bw-add">Guardar</button>
+  </div>
+  <div class="graf"><svg id="bw-graf" viewBox="0 0 300 150" preserveAspectRatio="none"></svg></div>
+  <div class="macros">
+    <div class="macro"><b id="bw-now">—</b><small>Actual</small></div>
+    <div class="macro"><b id="bw-week">—</b><small>Media 7d</small></div>
+    <div class="macro"><b id="bw-tot">—</b><small>Perdido</small></div>
+  </div>
+  <div id="bw-lista"></div>
+  <div class="notas">
+    <h2>Cómo leerlo</h2>
+    <ul>
+      <li>Fíjate en la <b>media semanal</b>, nunca en el número de un día suelto.</li>
+      <li>Ritmo bueno: <b>0,9-1 kg por semana</b>. Si dos semanas seguidas no baja, quita 150 kcal.</li>
+      <li>Subidas de 1-2 kg de un día para otro son agua y sal, sobre todo tras el fútbol.</li>
+    </ul>
+  </div>
+</section>
+
+</div>
+
+<div class="timer" id="timer">
+  <div class="timer-in">
+    <div class="cuenta" id="cuenta">2:00</div>
+    <div class="timer-txt">Descanso<br>entre series</div>
+    <button id="saltar">Saltar</button>
+  </div>
+  <div class="barra"><i id="barra"></i></div>
+</div>
+
+<nav>
+  <button class="on" data-p="gym"><i>▤</i>Gimnasio</button>
+  <button data-p="food"><i>◎</i>Comida</button>
+  <button data-p="prog"><i>◹</i>Progreso</button>
+</nav>
+
+<script>
+/* ================= DATOS ================= */
+const SES = {
+A:{nombre:"Piernas · pecho · espalda",ej:[
+ {n:"Prensa de piernas",p:"3 × 10-12",d:120,t:"Pies a la anchura de los hombros. Baja hasta 90° sin despegar la lumbar del respaldo."},
+ {n:"Press de pecho en máquina",p:"3 × 10-12",d:90,t:"Asiento ajustado para que las asas queden a la altura del pecho."},
+ {n:"Remo sentado en máquina",p:"3 × 10-12",d:90,t:"Codos atrás pegados al cuerpo. Pecho fuera, sin balanceo."},
+ {n:"Press de hombro en máquina",p:"3 × 10-12",d:90,t:"Sin arquear la espalda. Si molesta el hombro, reduce el recorrido."},
+ {n:"Curl femoral tumbado",p:"3 × 12",d:60,t:"Rodillas alineadas con el eje de giro de la máquina."},
+ {n:"Crunch abdominal en máquina",p:"2 × 15",d:45,t:"Recorrido corto y controlado, sin tirar del cuello."}]},
+B:{nombre:"Cadena posterior · espalda · pecho",ej:[
+ {n:"Curl femoral sentado",p:"3 × 10-12",d:90,t:"Empieza aquí para calentar la rodilla antes de la prensa."},
+ {n:"Jalón al pecho",p:"3 × 10-12",d:90,t:"Agarre algo más ancho que los hombros. Barra al pecho, no a la nuca."},
+ {n:"Prensa con pies altos",p:"3 × 10-12",d:120,t:"Pies arriba en la plataforma: más glúteo y femoral."},
+ {n:"Press inclinado en máquina",p:"3 × 10",d:90,t:"Si no hay, press de pecho con el asiento más bajo."},
+ {n:"Remo en polea baja",p:"3 × 12",d:90,t:"Agarre neutro, palmas enfrentadas. Espalda recta todo el recorrido."},
+ {n:"Face pull en polea alta",p:"3 × 15",d:45,t:"Poco peso. Esto es salud de hombro, no fuerza."}]},
+C:{nombre:"Cuádriceps · pecho · hombro · brazo",ej:[
+ {n:"Hack squat",p:"3 × 10",d:120,t:"Si no hay hack, prensa con pies bajos y juntos."},
+ {n:"Extensión de cuádriceps",p:"3 × 12",d:60,t:"Sube en 1 segundo, baja en 3. Aquí no hace falta peso alto."},
+ {n:"Contractor de pecho",p:"3 × 12",d:60,t:"Codos algo flexionados y fijos. Aprieta 1 segundo al cerrar."},
+ {n:"Pull-over en polea alta",p:"3 × 12",d:60,t:"Brazos casi rectos, empuja la barra hacia los muslos con la espalda."},
+ {n:"Elevaciones laterales en máquina",p:"3 × 15",d:45,t:"Hasta la altura del hombro, ni un centímetro más."},
+ {n:"Curl bíceps + tríceps en polea",p:"2 × 12",d:45,t:"Uno detrás del otro, sin descanso entre ellos."}]}
+};
+
+const COMIDAS = [
+{id:"cafe",h:"Mañana",t:"Cafés",s:"~120 kcal · 6 g proteína",o:[
+ "2 cafés con leche semi (250 ml en total)",
+ "Si pasas a 3 o 4 cafés, cambia a leche desnatada"]},
+{id:"com",h:"14:00",t:"Comida · táper",s:"~750 kcal · 65 g proteína",o:[
+ "220 g pollo + 250 g arroz cocido + salsa de tomate + 1 cda aceite + 1 fruta",
+ "220 g lomo de cerdo + 350 g patata al horno + tomate aliñado + 1 fruta",
+ "200 g ternera picada 90% + 200 g pasta + tomate con sofrito + 1 fruta",
+ "220 g pollo + 300 g boniato + salsa de tomate + 1 fruta"]},
+{id:"mer",h:"18:00",t:"Merienda · pre-entreno",s:"~400 kcal · 45 g proteína",o:[
+ "250 g skyr o queso batido 0% + 2 huevos cocidos + 1 fruta",
+ "250 g queso batido + 100 g pavo en lonchas + 1 fruta",
+ "200 g requesón + 40 g avena + 1 plátano",
+ "2 yogures griegos 0% + 3 huevos cocidos + 1 fruta"]},
+{id:"cen",h:"22:00",t:"Cena",s:"~730 kcal · 55 g proteína",o:[
+ "200 g ternera + 300 g patata + tomate aliñado + 1 cda aceite",
+ "200 g pollo + 200 g arroz + salsa de tomate + 1 cda aceite",
+ "Tortilla de 2 huevos y 4 claras + 300 g patata + 2 rebanadas de pan integral",
+ "200 g lomo de cerdo + 200 g pasta + tomate con sofrito"]}
+];
+
+/* ================= ESTADO ================= */
+let S = {gym:{}, hist:{}, food:{sel:{}, done:{}, fecha:""}, bw:[]};
+let sesion = "A";
+const $ = id => document.getElementById(id);
+
+const store = {
+  async get(k){
+    if(window.storage){ const r = await window.storage.get(k); return r ? r.value : null; }
+    return localStorage.getItem(k);
+  },
+  async set(k,v){
+    if(window.storage){ await window.storage.set(k,v); return; }
+    localStorage.setItem(k,v);
+  }
+};
+async function cargar(){
+  try{ const r = await store.get("miplan"); if(r) S = Object.assign(S, JSON.parse(r)); }catch(e){}
+}
+let pend;
+function guardar(){
+  clearTimeout(pend);
+  pend = setTimeout(()=>{ store.set("miplan", JSON.stringify(S)).catch(()=>{}); }, 400);
+}
+const hoy = () => new Date().toISOString().slice(0,10);
+
+/* ================= GIMNASIO ================= */
+function pintarGym(){
+  const s = SES[sesion];
+  $("gym-sub").textContent = s.nombre;
+  const cont = $("gym-lista");
+  cont.innerHTML = "";
+  s.ej.forEach((e,i)=>{
+    const k = sesion+"-"+i;
+    const st = S.gym[k] || {series:[],peso:""};
+    const total = parseInt(e.p.match(/^\d+/)[0],10);
+    const hechas = (st.series||[]).filter(Boolean).length;
+    const prev = S.hist[k];
+
+    const c = document.createElement("div");
+    c.className = "ej" + (hechas>=total ? " done" : "");
+    c.innerHTML =
+      '<div class="ej-top"><span class="num">'+String(i+1).padStart(2,"0")+'</span>'+
+      '<span class="nombre">'+e.n+'</span><span class="pauta">'+e.p+'</span></div>'+
+      '<p class="tip">'+e.t+'</p>'+
+      (prev ? '<p class="prev">Última vez · '+prev+' kg</p>' : '')+
+      '<div class="fila"><div class="dots"></div>'+
+      '<div class="peso"><input type="text" inputmode="decimal" value="'+(st.peso||"")+
+      '" placeholder="—" aria-label="Peso en '+e.n+'"><label>kg</label></div></div>';
+
+    const dots = c.querySelector(".dots");
+    for(let j=0;j<total;j++){
+      const b = document.createElement("button");
+      b.className = "dot" + (st.series && st.series[j] ? " on" : "");
+      b.textContent = j+1;
+      b.setAttribute("aria-label","Serie "+(j+1)+" de "+e.n);
+      b.onclick = ()=>{
+        const cur = S.gym[k] || {series:[],peso:""};
+        cur.series = cur.series || [];
+        cur.series[j] = !cur.series[j];
+        S.gym[k] = cur;
+        if(cur.series[j]){ if(cur.peso) S.hist[k] = cur.peso; descanso(e.d); }
+        guardar(); pintarGym();
+      };
+      dots.appendChild(b);
+    }
+    c.querySelector("input").oninput = ev=>{
+      const cur = S.gym[k] || {series:[],peso:""};
+      cur.peso = ev.target.value;
+      S.gym[k] = cur;
+      if(ev.target.value) S.hist[k] = ev.target.value;
+      guardar();
+    };
+    cont.appendChild(c);
+  });
+}
+$("gym-reset").onclick = ()=>{
+  SES[sesion].ej.forEach((_,i)=>{ if(S.gym[sesion+"-"+i]) S.gym[sesion+"-"+i].series = []; });
+  guardar(); pintarGym();
+};
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+    t.classList.add("on"); sesion = t.dataset.s; pintarGym();
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+});
+
+/* ================= DESCANSO ================= */
+let reloj;
+function descanso(seg){
+  clearInterval(reloj);
+  let q = seg; const tot = seg;
+  $("timer").classList.add("show");
+  const tick = ()=>{
+    const m = Math.floor(q/60), s = q%60;
+    $("cuenta").textContent = m+":"+String(s).padStart(2,"0");
+    $("barra").style.width = Math.max(0,q/tot*100)+"%";
+    if(q<=0){
+      clearInterval(reloj);
+      $("cuenta").textContent = "¡Vamos!";
+      if(navigator.vibrate) navigator.vibrate([200,80,200]);
+      setTimeout(()=>$("timer").classList.remove("show"),2500);
+    }
+    q--;
+  };
+  tick(); reloj = setInterval(tick,1000);
+}
+$("saltar").onclick = ()=>{ clearInterval(reloj); $("timer").classList.remove("show"); };
+
+/* ================= COMIDA ================= */
+function pintarFood(){
+  if(S.food.fecha !== hoy()){ S.food.done = {}; S.food.fecha = hoy(); guardar(); }
+  const cont = $("food-lista");
+  cont.innerHTML = "";
+  COMIDAS.forEach(m=>{
+    const sel = S.food.sel[m.id] || 0;
+    const done = !!S.food.done[m.id];
+    const c = document.createElement("div");
+    c.className = "meal";
+    c.innerHTML =
+      '<div class="meal-h"><div class="hora">'+m.h+'</div>'+
+      '<div class="meal-t"><b>'+m.t+'</b><small>'+m.s+'</small></div>'+
+      '<button class="check'+(done?" on":"")+'" aria-label="Marcar '+m.t+'">✓</button></div>'+
+      '<div class="opts"></div>';
+    const opts = c.querySelector(".opts");
+    m.o.forEach((txt,j)=>{
+      const o = document.createElement("div");
+      o.className = "opt" + (j===sel ? " sel" : "");
+      o.innerHTML = '<em>'+(j===sel?"●":"○")+'</em><span>'+txt+'</span>';
+      o.onclick = ()=>{ S.food.sel[m.id] = j; guardar(); pintarFood(); };
+      opts.appendChild(o);
+    });
+    c.querySelector(".check").onclick = ()=>{
+      S.food.done[m.id] = !S.food.done[m.id]; guardar(); pintarFood();
+    };
+    cont.appendChild(c);
+  });
+}
+$("food-reset").onclick = ()=>{ S.food.done = {}; guardar(); pintarFood(); };
+
+/* ================= PROGRESO ================= */
+$("bw-add").onclick = ()=>{
+  const v = parseFloat(($("bw-val").value||"").replace(",","."));
+  if(isNaN(v) || v < 30 || v > 300) return;
+  S.bw = S.bw.filter(x=>x.f !== hoy());
+  S.bw.push({f:hoy(), v:v});
+  S.bw.sort((a,b)=>a.f.localeCompare(b.f));
+  $("bw-val").value = "";
+  guardar(); pintarProg();
+};
+function pintarProg(){
+  const d = S.bw;
+  const cont = $("bw-lista");
+  cont.innerHTML = "";
+  [...d].reverse().slice(0,14).forEach(x=>{
+    const r = document.createElement("div");
+    r.className = "reg";
+    const p = x.f.split("-");
+    r.innerHTML = '<span>'+p[2]+'/'+p[1]+'</span><b>'+x.v.toFixed(1)+' kg</b>';
+    const del = document.createElement("button");
+    del.className = "del"; del.textContent = "×"; del.setAttribute("aria-label","Borrar registro");
+    del.onclick = ()=>{ S.bw = S.bw.filter(y=>y.f!==x.f); guardar(); pintarProg(); };
+    r.appendChild(del);
+    cont.appendChild(r);
+  });
+
+  $("bw-now").textContent = d.length ? d[d.length-1].v.toFixed(1) : "—";
+  const last7 = d.slice(-4);
+  $("bw-week").textContent = last7.length
+    ? (last7.reduce((a,b)=>a+b.v,0)/last7.length).toFixed(1) : "—";
+  $("bw-tot").textContent = d.length>1
+    ? "-"+(d[0].v - d[d.length-1].v).toFixed(1) : "—";
+
+  const svg = $("bw-graf");
+  if(d.length < 2){
+    svg.innerHTML = '<text x="150" y="78" fill="#8FAFAD" font-size="11" text-anchor="middle" '+
+      'font-family="sans-serif">Añade dos pesadas para ver la curva</text>';
+    return;
+  }
+  const vs = d.map(x=>x.v);
+  const mn = Math.min(...vs)-0.6, mx = Math.max(...vs)+0.6;
+  const px = i => 8 + i*(284/(d.length-1));
+  const py = v => 138 - ((v-mn)/(mx-mn))*126;
+  const pts = d.map((x,i)=>px(i)+","+py(x.v)).join(" ");
+  svg.innerHTML =
+    '<polyline points="'+pts+'" fill="none" stroke="#F2B33D" stroke-width="2" '+
+    'stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+    d.map((x,i)=>'<circle cx="'+px(i)+'" cy="'+py(x.v)+'" r="3" fill="#F2B33D"/>').join("")+
+    '<text x="8" y="12" fill="#8FAFAD" font-size="10" font-family="sans-serif">'+mx.toFixed(1)+'</text>'+
+    '<text x="8" y="148" fill="#8FAFAD" font-size="10" font-family="sans-serif">'+mn.toFixed(1)+'</text>';
+}
+
+/* ================= NAVEGACIÓN ================= */
+document.querySelectorAll("nav button").forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    ["gym","food","prog"].forEach(p=>{
+      $("p-"+p).classList.toggle("hidden", p !== b.dataset.p);
+    });
+    window.scrollTo(0,0);
+  };
+});
+
+cargar().then(()=>{ pintarGym(); pintarFood(); pintarProg(); });
+</script>
+</body>
+</html>
